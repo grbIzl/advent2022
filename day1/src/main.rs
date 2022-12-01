@@ -1,38 +1,34 @@
 use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
+use std::io::{self, prelude::*, BufReader};
 
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
+
+// fn day_1_2_ugly(v: &mut Vec<i32>, input: &str) -> &mut Vec<i32>{
+fn day_1_2_ugly<'a>(v: &'a mut Vec<i32>, input: &'a str) -> &'a mut Vec<i32> {
+    let file = File::open(input).unwrap();
+    let reader = BufReader::new(file);
+    let mut sum = 0;
+    for line in reader.lines() {
+        let line = line.unwrap();
+        if line.trim().is_empty() {
+            // println!("SUM: {}", sum);
+            // println!("-----------------------------------------------");
+            v.push(sum);
+            sum = 0;
+        } else {
+            // println!("sum: {}, elem: {}", sum, line.trim().parse::<i32>().unwrap());
+            sum += line.trim().parse::<i32>().unwrap();
+        }
+    }
+    v.sort();
+    v.reverse();
+    v
 }
 
+
 fn main() {
-    if let Ok(lines) = read_lines("./input2.txt") {
-        let mut current_elf_calories = 0;
-        let mut elves: Vec<i32> = Vec::new();
-        for line in lines {
-            if let Ok(calorie) = line {
-                if calorie.is_empty() {
-                    println!("Current elf calories: {}", current_elf_calories);
-                    elves.push(current_elf_calories);
-                    current_elf_calories = 0;
-                } else {
-                    let calories: i32 = calorie.parse().unwrap();
-                    current_elf_calories = current_elf_calories + calories;
-                }
-            }
-        }
-
-        if current_elf_calories > 0 {
-            println!("Current elf calories: {}", current_elf_calories);
-            elves.push(current_elf_calories);
-        }
-
-        elves.sort_unstable();
-        let sum: i32 = elves.iter().rev().take(3).sum();
-
-        println!("Sum {}", sum);
-    }
+    let mut v: Vec<i32> = Vec::new();
+    let res = day_1_2_ugly(&mut v, "input.txt");
+    // let day_1 = day_1_ugly("test.txt");
+    println!("Solution 1: {}", res[0]);
+    println!("Solution 2: {}", res[0] + res[1] + res[2]);
 }
