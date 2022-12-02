@@ -2,8 +2,8 @@ use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 
 
-// fn day_1_2_ugly(v: &mut Vec<i32>, input: &str) -> &mut Vec<i32>{
-fn day_1_2_ugly<'a>(v: &'a mut Vec<i32>, input: &'a str) -> &'a mut Vec<i32> {
+fn part_1_2(input: &str) -> Vec<i32> {
+    let mut v: Vec<i32> = Vec::new();
     let file = File::open(input).unwrap();
     let reader = BufReader::new(file);
     let mut sum = 0;
@@ -26,9 +26,7 @@ fn day_1_2_ugly<'a>(v: &'a mut Vec<i32>, input: &'a str) -> &'a mut Vec<i32> {
 
 
 fn main() {
-    let mut v: Vec<i32> = Vec::new();
-    let res = day_1_2_ugly(&mut v, "input.txt");
-    // let day_1 = day_1_ugly("test.txt");
+    let res = day_1_2_ugly("input.txt");
     println!("Solution 1: {}", res[0]);
     println!("Solution 2: {}", res[0] + res[1] + res[2]);
 }
