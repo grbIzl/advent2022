@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 use itertools::Itertools; // 0.9.0
 use std::collections::HashSet;
+
+
 fn prepare_data(input: &str) -> Vec<(char, char)> {
     let mut v: Vec<(char, char)> = Vec::new();
     let file = File::open(input).unwrap();
