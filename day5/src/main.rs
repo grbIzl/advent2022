@@ -28,49 +28,73 @@ fn prepare_stacks(part: &str) -> Vec<LinkedList<char>> {
     v
 }
 
-fn prepare_commands(input: &str) -> Vec<(u8, u8, u8)> {
-    let mut v = Vec::new();
+fn prepare_commands(input: &str) -> (Vec<LinkedList<char>>, Vec<(u8, u8, u8)>) {
+    let mut temp_stacks = Vec::new();
     let file = File::open(input).unwrap();
     let reader = BufReader::new(file);
+    let mut stacks = Vec::new();
+    let mut commands = Vec::new();
+
     for line in reader.lines() {
+        // Building the stack
         let line = line.unwrap();
-        let (count, from, to) = scan_fmt!( &line,  // input string
+        if line.trim().is_empty() || line.trim().starts_with("1") {
+            continue;
+        } else if line.trim().starts_with("move") {
+            let (count, from, to) = scan_fmt!( &line,  // input string
                             "move {} from {} to {}",     // format
                             u8, u8, u8).unwrap();
-        v.push((count, from, to));
+            commands.push((count, from, to));
+        } else {
+            let mut fixed = line.replace("    ", "_").replace("[", "").replace("]", "");
+            fixed.retain(|c| !c.is_whitespace());
+            let vec: Vec<char> = fixed.chars().collect();
+            temp_stacks.push(vec)
+        }
     }
-    v
+    for i in 0..temp_stacks[0].len() {
+        let mut stack = LinkedList::new();
+        for j in (0..temp_stacks.len()).rev() {
+            if temp_stacks[j][i] != '_' {
+                stack.push_back(temp_stacks[j][i])
+            }
+        }
+        stacks.push(stack.clone());
+    }
+    (stacks, commands)
 }
 
 fn main() {
-    // let mut stacks = prepare_stacks("part1");
-    // let commands = prepare_commands("test.txt");
+    let (mut stacks, commands) = prepare_commands("input.txt");
+    let mut stacks_2 = stacks.clone();
 
-    let mut stacks = prepare_stacks("part2");
-    let commands = prepare_commands("input.txt");
-
-    // //Part 1
-    // for (count, from, to) in commands {
-    //     for _ in 0..count {
-    //         let elem = stacks[usize::from(from)].pop_back().unwrap();
-    //         stacks[usize::from(to)].push_back(elem);
-    //     }
-    // }
-
+    // Part 1
+    for (count, from, to) in &commands {
+        for _ in 0..*count {
+            let elem = stacks[usize::from(from - 1)].pop_back().unwrap();
+            stacks[usize::from(to - 1)].push_back(elem);
+        }
+    }
+    println!("Part 1 solution: ");
+    for mut stack in stacks {
+        let elem = stack.pop_back().unwrap();
+        print!("{elem}")
+    }
+    println!("");
     //Part 2
-    for (count, from, to) in commands {
+    for (count, from, to) in &commands {
         let mut helper_list = LinkedList::new();
-        for _ in 0..count {
-            let elem = stacks[usize::from(from)].pop_back().unwrap();
+        for _ in 0..*count {
+            let elem = stacks_2[usize::from(from - 1)].pop_back().unwrap();
             helper_list.push_back(elem);
         }
         for _ in 0..helper_list.len() {
             let elem = helper_list.pop_back().unwrap();
-            stacks[usize::from(to)].push_back(elem);
+            stacks_2[usize::from(to - 1)].push_back(elem);
         }
     }
-
-    for mut stack in stacks {
+    println!("Part 2 solution: ");
+    for mut stack in stacks_2 {
         let elem = stack.pop_back().unwrap();
         print!("{elem}")
     }
